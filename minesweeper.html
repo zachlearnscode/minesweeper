@@ -5,6 +5,8 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Minesweeper</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
   <style>
     * {
@@ -19,8 +21,8 @@
     <div :style="wrapper">
       <div
         v-for="(boardCell, i) in board.flat()"
-        :style="[cell, boardCell.clicked ? clicked : unclicked]"
-        @click="boardCell.clicked = true"
+        :style="[cell, boardCell.content === '💣' ? '' : fontSize, boardCell.clicked ? revealed : hidden]"
+        @click="reveal(boardCell, i)"
       >
         {{boardCell.clicked ? boardCell.content : ''}}
       </div>
