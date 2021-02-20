@@ -18,14 +18,32 @@ var app = new Vue({
         {content: "", clicked: false}
       ]
     ],
-    remainingBoard: this.unclickedCells,
-    wrapper: {
+    interfaceWrapper: {
+      display: 'flex',
+      flexDirection: "column",
+      justifyContent: 'center',
+      alignItems: 'center',
+      width: "calc(6rem + 6px)",
+      height: "calc(8rem + 4px)",
+      backgroundColor: "#D6D6D6",
+      borderStyle: "outset",
+      borderWidth: "3px",
+      padding: '.5rem'
+    },
+    gameHeader: {
+      display: 'flex',
+      justifyContent: 'between',
+      alignItems: 'center',
       width: '6rem',
-      height: '6rem',
+      height: '2rem'
+    },
+    boardWrapper: {
       display: 'grid',
-      gridTemplateColumns: "2rem 2rem 2rem",
-      gridTemplateRows: "2rem 2rem 2rem",
-      background: '#D6D6D6'
+      gridTemplateColumns: "repeat(3, 1fr)",
+      gridTemplateRows: "repeat(3, 1fr)",
+      background: '#D6D6D6',
+      borderStyle: 'inset',
+      borderWidth: '1.5px'
     },
     cell: {
       display: 'flex',
@@ -33,17 +51,27 @@ var app = new Vue({
       alignItems: 'center',
       width: '2rem',
       height: '2rem',
-      background: '#D6D6D6',
       fontFamily: "VT323, monospace"
     },
-    fontSize: {
-      fontSize: "1.7rem"
+    fontStyles: {
+      size: {fontSize: "1.7rem"},
+      blue: {color: 'blue'},
+      green: {color: 'green'},
+      red: {color: "red"},
+      darkBlue: {color: "darkblue"}
     },
     hidden: {
-      borderStyle: "outset"
+      background: '#D6D6D6',
+      borderStyle: "outset",
+      borderWidth: "1.5px"
     },
-    revealed: {
-      border: '0.5px solid darkgray'
+    revealedOdd: {
+      background: '#E3E3E3',
+      border: '1.5px solid #E3E3E3'
+    },
+    revealedEven: {
+      background: '#D6D6D6',
+      border: '1.5px solid #D6D6D6'
     }
   },
   computed: {
@@ -75,6 +103,26 @@ var app = new Vue({
           }
         }
         return console.log("You Win!")
+      }
+    },
+    revealed(i) {
+      if (i % 2 === 0) {
+        return this.revealedEven;
+      } else {
+        return this.revealedOdd;
+      }
+    },
+    colorize(num) {
+      if (Number(num) === 1) {
+        return this.fontStyles.blue;
+      } else if (Number(num) === 2) {
+        return this.fontStyles.green;
+      } else if (Number(num) === 3) {
+        return this.fontStyles.red;
+      } else if (Number(num) === 4) {
+        return this.fontStyles.darkBlue;
+      } else {
+        return '';
       }
     },
     boundsCheck(row, col) {
@@ -112,5 +160,8 @@ var app = new Vue({
         }
       }
     }
+  },
+  filters: {
+    //
   }
 })

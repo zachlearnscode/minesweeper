@@ -12,20 +12,30 @@
     * {
       margin: 0;
       padding: 0;
-      box-sizing: border-box;
+      box-sizing: content-box;
     }
   </style>
 </head>
 <body>
   <div id="app">
-    <div :style="wrapper">
-      <div
-        v-for="(boardCell, i) in board.flat()"
-        :style="[cell, boardCell.content === '💣' ? '' : fontSize, boardCell.clicked ? revealed : hidden]"
-        @click="reveal(boardCell, i)"
-      >
-        {{boardCell.clicked ? boardCell.content : ''}}
+    <div :style="interfaceWrapper">
+      <div :style="gameHeader">
+        <div id="bombsRemaining"></div>
+        <div id="faceEmoji"></div>
+        <div id="time"></div>
       </div>
+      <div :style="boardWrapper">
+        <div
+          v-for="(boardCell, i) in board.flat()"
+          :style="[cell,
+                  boardCell.content !== '💣' ? fontStyles.size : '',
+                  colorize(boardCell.content),
+                  boardCell.clicked ? revealed(i) : hidden]"
+          @click="reveal(boardCell, i)"
+        >
+          {{boardCell.clicked ? boardCell.content : ''}}
+        </div>
+        </div>
       </div>
     </div>
   </div>
