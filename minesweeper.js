@@ -5,26 +5,103 @@ var app = new Vue({
       [
         {content: "", clicked: false},
         {content: "💣", clicked: false},
+        {content: "", clicked: false},
+        {content: "", clicked: false},
+        {content: "", clicked: false},
+        {content: "", clicked: false},
+        {content: "", clicked: false},
+        {content: "💣", clicked: false},
+        {content: "", clicked: false},
         {content: "", clicked: false}
       ],
       [
         {content: "", clicked: false},
         {content: "💣", clicked: false},
-        {content: "💣", clicked: false}
+        {content: "", clicked: false},
+        {content: "", clicked: false},
+        {content: "", clicked: false},
+        {content: "", clicked: false},
+        {content: "", clicked: false},
+        {content: "", clicked: false},
+        {content: "", clicked: false},
+        {content: "", clicked: false}
       ],
       [
+        {content: "", clicked: false},
+        {content: "💣", clicked: false},
+        {content: "", clicked: false},
+        {content: "", clicked: false},
+        {content: "", clicked: false},
+        {content: "", clicked: false},
+        {content: "", clicked: false},
+        {content: "", clicked: false},
+        {content: "", clicked: false},
+        {content: "", clicked: false}
+      ],
+      [
+        {content: "", clicked: false},
+        {content: "💣", clicked: false},
+        {content: "💣", clicked: false},
+        {content: "", clicked: false},
+        {content: "", clicked: false},
+        {content: "", clicked: false},
+        {content: "", clicked: false},
+        {content: "", clicked: false},
+        {content: "", clicked: false},
+        {content: "", clicked: false}
+      ],
+      [
+        {content: "💣", clicked: false},
+        {content: "💣", clicked: false},
+        {content: "", clicked: false},
+        {content: "", clicked: false},
+        {content: "", clicked: false},
+        {content: "", clicked: false},
+        {content: "", clicked: false},
+        {content: "", clicked: false},
+        {content: "", clicked: false},
+        {content: "", clicked: false}
+      ],
+      [
+        {content: "", clicked: false},
+        {content: "", clicked: false},
+        {content: "", clicked: false},
+        {content: "", clicked: false},
+        {content: "", clicked: false},
+        {content: "", clicked: false},
+        {content: "", clicked: false},
+        {content: "", clicked: false},
+        {content: "", clicked: false},
+        {content: "", clicked: false}
+      ],
+      [
+        {content: "", clicked: false},
+        {content: "", clicked: false},
+        {content: "", clicked: false},
+        {content: "", clicked: false},
+        {content: "", clicked: false},
+        {content: "", clicked: false},
+        {content: "", clicked: false},
+        {content: "💣", clicked: false},
+        {content: "", clicked: false},
+        {content: "", clicked: false}
+      ],
+      [
+        {content: "", clicked: false},
+        {content: "", clicked: false},
+        {content: "", clicked: false},
+        {content: "", clicked: false},
+        {content: "", clicked: false},
+        {content: "", clicked: false},
+        {content: "", clicked: false},
         {content: "", clicked: false},
         {content: "💣", clicked: false},
         {content: "", clicked: false}
       ]
     ],
     interfaceWrapper: {
-      display: 'flex',
-      flexDirection: "column",
-      justifyContent: 'center',
-      alignItems: 'center',
-      width: "calc(6rem + 6px)",
-      height: "calc(8rem + 4px)",
+      
+      width: "10rem",
       backgroundColor: "#D6D6D6",
       borderStyle: "outset",
       borderWidth: "3px",
@@ -34,24 +111,40 @@ var app = new Vue({
       display: 'flex',
       justifyContent: 'between',
       alignItems: 'center',
-      width: '6rem',
+      width: '10rem',
       height: '2rem'
     },
     boardWrapper: {
-      display: 'grid',
-      gridTemplateColumns: "repeat(3, 1fr)",
-      gridTemplateRows: "repeat(3, 1fr)",
+      width: '20rem',
+      height: `calc(20rem * .8)`,
       background: '#D6D6D6',
-      borderStyle: 'inset',
-      borderWidth: '1.5px'
+      display: 'grid',
+      gridTemplateColumns: '1fr'
+    },
+    boardRow: {
+      width: '20rem',
+      height: '2rem',
+      display: 'flex'
     },
     cell: {
+      width: '2rem',
+      height: '2rem',
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
-      width: '2rem',
-      height: '2rem',
       fontFamily: "VT323, monospace"
+    },
+    hiddenDark: {
+      backgroundColor: '#33CC33'
+    },
+    hiddenLight: {
+      backgroundColor: '#66FF66'
+    },
+    revealedDark: {
+      backgroundColor: '#FFCC00'
+    },
+    revealedLight: {
+      backgroundColor: '#FFCC66'
     },
     fontStyles: {
       size: {fontSize: "1.7rem"},
@@ -61,21 +154,14 @@ var app = new Vue({
       darkBlue: {color: "darkblue"}
     },
     hidden: {
-      background: '#D6D6D6',
-      borderStyle: "outset",
-      borderWidth: "1.5px"
+      background: '#D6D6D6'
     },
     revealedOdd: {
-      background: '#E3E3E3',
-      border: '1.5px solid #E3E3E3'
+      background: '#E3E3E3'
     },
     revealedEven: {
-      background: '#D6D6D6',
-      border: '1.5px solid #D6D6D6'
+      background: '#D6D6D6'
     }
-  },
-  computed: {
-
   },
   methods: {
     remainingCells() {
@@ -105,11 +191,35 @@ var app = new Vue({
         return console.log("You Win!")
       }
     },
-    revealed(i) {
-      if (i % 2 === 0) {
-        return this.revealedEven;
+    colorCell(row, col, clicked) {
+      if (row % 2 === 0) {
+        if (col % 2 === 0) {
+          if (!clicked) {
+            return this.hiddenDark;
+          } else {
+            return this.revealedDark;
+          }
+        } else {
+          if (!clicked) {
+            return this.hiddenLight;
+          } else {
+            return this.revealedLight;
+          }
+        }
       } else {
-        return this.revealedOdd;
+        if (col % 2 === 0) {
+          if (!clicked) {
+            return this.hiddenLight;
+          } else {
+            return this.revealedLight;
+          }
+        } else {
+          if (!clicked) {
+            return this.hiddenDark;
+          } else {
+            return this.revealedDark;
+          }
+        }
       }
     },
     colorize(num) {
@@ -160,8 +270,5 @@ var app = new Vue({
         }
       }
     }
-  },
-  filters: {
-    //
   }
 })
