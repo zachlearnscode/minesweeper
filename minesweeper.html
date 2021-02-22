@@ -18,19 +18,24 @@
 <body>
   <div id="app">
     
-      <div :style="boardWrapper">
-        <div v-for="(row, rowIndex) in board" :style="boardRow">
-          <div
-            v-for="(col, colIndex) in row"
-            :style="[cell,
-                    colorCell(rowIndex, colIndex, col.clicked),
-                    colorize(col.content)]"
-            @click="reveal(rowIndex, colIndex)"
-          >
-            {{col.clicked ? col.content : ''}}
-          </div>
+    <div :style="boardWrapper">
+      <div v-for="(row, rowIndex) in board" :style="boardRow">
+        <div
+          v-for="(col, colIndex) in row"
+          :style="[cell,
+                  colorCell(rowIndex, colIndex, col.hidden),
+                  colorize(col.content)]"
+          @click="reveal(rowIndex, colIndex)"
+          @click.right.prevent="col.marked = !col.marked"
+        >
+          {{ col.hidden ? col.marked ? '❌' : '' : col.content }}
         </div>
       </div>
+    </div>
+
+    <div>
+      <button type="button" @click="newGame">New Game</button>
+    </div>
 
 
   </div>

@@ -3,100 +3,100 @@ var app = new Vue({
   data: {
     board: [
       [
-        {content: "", clicked: false},
-        {content: "💣", clicked: false},
-        {content: "", clicked: false},
-        {content: "", clicked: false},
-        {content: "", clicked: false},
-        {content: "", clicked: false},
-        {content: "", clicked: false},
-        {content: "💣", clicked: false},
-        {content: "", clicked: false},
-        {content: "", clicked: false}
+        {content: "", hidden: true, marked: false},
+        {content: "💣", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false},
+        {content: "💣", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false}
       ],
       [
-        {content: "", clicked: false},
-        {content: "💣", clicked: false},
-        {content: "", clicked: false},
-        {content: "", clicked: false},
-        {content: "", clicked: false},
-        {content: "", clicked: false},
-        {content: "", clicked: false},
-        {content: "", clicked: false},
-        {content: "", clicked: false},
-        {content: "", clicked: false}
+        {content: "", hidden: true, marked: false},
+        {content: "💣", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false}
       ],
       [
-        {content: "", clicked: false},
-        {content: "💣", clicked: false},
-        {content: "", clicked: false},
-        {content: "", clicked: false},
-        {content: "", clicked: false},
-        {content: "", clicked: false},
-        {content: "", clicked: false},
-        {content: "", clicked: false},
-        {content: "", clicked: false},
-        {content: "", clicked: false}
+        {content: "", hidden: true, marked: false},
+        {content: "💣", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false}
       ],
       [
-        {content: "", clicked: false},
-        {content: "💣", clicked: false},
-        {content: "💣", clicked: false},
-        {content: "", clicked: false},
-        {content: "", clicked: false},
-        {content: "", clicked: false},
-        {content: "", clicked: false},
-        {content: "", clicked: false},
-        {content: "", clicked: false},
-        {content: "", clicked: false}
+        {content: "", hidden: true, marked: false},
+        {content: "💣", hidden: true, marked: false},
+        {content: "💣", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false}
       ],
       [
-        {content: "💣", clicked: false},
-        {content: "💣", clicked: false},
-        {content: "", clicked: false},
-        {content: "", clicked: false},
-        {content: "", clicked: false},
-        {content: "", clicked: false},
-        {content: "", clicked: false},
-        {content: "", clicked: false},
-        {content: "", clicked: false},
-        {content: "", clicked: false}
+        {content: "💣", hidden: true, marked: false},
+        {content: "💣", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false}
       ],
       [
-        {content: "", clicked: false},
-        {content: "", clicked: false},
-        {content: "", clicked: false},
-        {content: "", clicked: false},
-        {content: "", clicked: false},
-        {content: "", clicked: false},
-        {content: "", clicked: false},
-        {content: "", clicked: false},
-        {content: "", clicked: false},
-        {content: "", clicked: false}
+        {content: "", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false}
       ],
       [
-        {content: "", clicked: false},
-        {content: "", clicked: false},
-        {content: "", clicked: false},
-        {content: "", clicked: false},
-        {content: "", clicked: false},
-        {content: "", clicked: false},
-        {content: "", clicked: false},
-        {content: "💣", clicked: false},
-        {content: "", clicked: false},
-        {content: "", clicked: false}
+        {content: "", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false},
+        {content: "💣", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false}
       ],
       [
-        {content: "", clicked: false},
-        {content: "", clicked: false},
-        {content: "", clicked: false},
-        {content: "", clicked: false},
-        {content: "", clicked: false},
-        {content: "", clicked: false},
-        {content: "", clicked: false},
-        {content: "", clicked: false},
-        {content: "💣", clicked: false},
-        {content: "", clicked: false}
+        {content: "", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false},
+        {content: "💣", hidden: true, marked: false},
+        {content: "", hidden: true, marked: false}
       ]
     ],
     interfaceWrapper: {
@@ -164,6 +164,26 @@ var app = new Vue({
     }
   },
   methods: {
+    newGame() {
+      let coords = []; counter = 0;
+      while (counter < 10) {
+        coords.push([Math.floor((Math.random() * 7) + 1), Math.floor(Math.random() * 9) + 1]);
+        counter++;
+      }
+      console.log(coords)
+      for (let row = 0; row < this.board.length; row++) {
+        for (let col = 0; col < this.board[row].length; col++) {
+          this.board[row][col].content = ""
+          this.board[row][col].hidden = true;
+        }
+      }
+
+      for (let i = 0; i < coords.length; i++) {
+        this.board[coords[i][0]][coords[i][1]].content = "💣";
+      }
+
+      this.setClues();
+    },
     remainingCells() {
       let remaining = [];
       let board = this.board.flat();
@@ -179,14 +199,16 @@ var app = new Vue({
     reveal(row, col) {
       let cell = this.board[row][col];
 
-      if (cell.content &&
+      if (!cell.marked) {
+        if (cell.content &&
           cell.content != "💣") {
-        return cell.clicked = true;
-      } else if (!cell.content) {
-        cell.clicked = true;
-        return this.revealAdjacent(row, col); 
-      } else {
-        return cell.clicked = true;
+          return cell.hidden = false;
+        } else if (!cell.content) {
+          cell.hidden = false;
+          return this.revealAdjacent(row, col); 
+        } else {
+          return cell.hidden = false;
+        }
       }
     },
     revealAdjacent(row, col) {
@@ -205,8 +227,8 @@ var app = new Vue({
         let cell = this.boundsCheck(adjacentCells[i].row, adjacentCells[i].col);
 
         if (cell) {
-          if (!cell.clicked) {
-            cell.clicked = true;
+          if (cell.hidden && !cell.marked) {
+            cell.hidden = false;
             if (!cell.content) {
               this.revealAdjacent(adjacentCells[i].row, adjacentCells[i].col)
             }
@@ -214,16 +236,16 @@ var app = new Vue({
         }
       }
     },
-    colorCell(row, col, clicked) {
+    colorCell(row, col, hidden) {
       if (row % 2 === 0) {
         if (col % 2 === 0) {
-          if (!clicked) {
+          if (hidden) {
             return this.hiddenDark;
           } else {
             return this.revealedDark;
           }
         } else {
-          if (!clicked) {
+          if (hidden) {
             return this.hiddenLight;
           } else {
             return this.revealedLight;
@@ -231,13 +253,13 @@ var app = new Vue({
         }
       } else {
         if (col % 2 === 0) {
-          if (!clicked) {
+          if (hidden) {
             return this.hiddenLight;
           } else {
             return this.revealedLight;
           }
         } else {
-          if (!clicked) {
+          if (hidden) {
             return this.hiddenDark;
           } else {
             return this.revealedDark;
@@ -272,31 +294,33 @@ var app = new Vue({
           return 1;
         } 
       }
-      
-    }
-  },
-  mounted() {
-    for (let row = 0; row < this.board.length; row++) {
-      for (let col = 0; col < this.board[row].length; col++) {
-
-        let curr = this.board[row][col];
-        if (curr.content === "") {
-          let nearbyBombs = 0;
-
-          nearbyBombs += this.bombCheck(this.boundsCheck(row - 1, col)) || 0;
-          nearbyBombs += this.bombCheck(this.boundsCheck(row + 1, col)) || 0;
-          nearbyBombs += this.bombCheck(this.boundsCheck(row, col - 1)) || 0;
-          nearbyBombs += this.bombCheck(this.boundsCheck(row, col + 1)) || 0;
-          nearbyBombs += this.bombCheck(this.boundsCheck(row - 1, col - 1)) || 0;
-          nearbyBombs += this.bombCheck(this.boundsCheck(row - 1, col + 1)) || 0;
-          nearbyBombs += this.bombCheck(this.boundsCheck(row + 1, col - 1)) || 0;
-          nearbyBombs += this.bombCheck(this.boundsCheck(row + 1, col + 1)) || 0;
-
-          if (nearbyBombs !== 0) {
-            curr.content = String(nearbyBombs);
+    },
+    setClues() {
+      for (let row = 0; row < this.board.length; row++) {
+        for (let col = 0; col < this.board[row].length; col++) {
+  
+          let curr = this.board[row][col];
+          if (curr.content === "") {
+            let nearbyBombs = 0;
+  
+            nearbyBombs += this.bombCheck(this.boundsCheck(row - 1, col)) || 0;
+            nearbyBombs += this.bombCheck(this.boundsCheck(row + 1, col)) || 0;
+            nearbyBombs += this.bombCheck(this.boundsCheck(row, col - 1)) || 0;
+            nearbyBombs += this.bombCheck(this.boundsCheck(row, col + 1)) || 0;
+            nearbyBombs += this.bombCheck(this.boundsCheck(row - 1, col - 1)) || 0;
+            nearbyBombs += this.bombCheck(this.boundsCheck(row - 1, col + 1)) || 0;
+            nearbyBombs += this.bombCheck(this.boundsCheck(row + 1, col - 1)) || 0;
+            nearbyBombs += this.bombCheck(this.boundsCheck(row + 1, col + 1)) || 0;
+  
+            if (nearbyBombs !== 0) {
+              curr.content = String(nearbyBombs);
+            }
           }
         }
       }
     }
+  },
+  mounted() {
+    this.setClues();
   }
 })
