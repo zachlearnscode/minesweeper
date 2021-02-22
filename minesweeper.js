@@ -99,6 +99,7 @@ var app = new Vue({
         {content: "", hidden: true, marked: false}
       ]
     ],
+    numBombs: 10,
     interfaceWrapper: {
       
       width: "10rem",
@@ -161,25 +162,61 @@ var app = new Vue({
     },
     revealedEven: {
       background: '#D6D6D6'
+    },
+    seconds: 0
+  },
+  computed: {
+    hiddenCells() {
+      return this.board.flat().filter(c => c.hidden);
     }
   },
   methods: {
+    timeElapsed() {
+      if (this.board.flat()
+            .some(c => !c.hidden)) {
+        
+        return this.seconds = setInterval(() => this.seconds++, 1000)
+      } else {
+        return 0
+      }
+    },
+    youWin() {
+      if (this.hiddenCells.length === 10 &&
+          this.hiddenCells.every(c => c.content === "💣")) {
+        return console.log("You win")
+      }
+    },
     newGame() {
-      let coords = []; counter = 0;
+      let allCoords = []; counter = 0;
       while (counter < 10) {
-        coords.push([Math.floor((Math.random() * 7) + 1), Math.floor(Math.random() * 9) + 1]);
+        function createCoords() {
+          let row = Math.floor((Math.random() * 7) + 1);
+          let col = Math.floor((Math.random() * 9) + 1);
+          return [row, col];
+        }
+
+        function checkCoords(coords) {
+          if (!allCoords.some(c => c[0] === coords[0] && c[1] === coords[1])) {
+            return allCoords.push(coords);
+          } else {
+            return checkCoords(createCoords());
+          }
+        }
+
+        checkCoords(createCoords());
         counter++;
       }
-      console.log(coords)
+
       for (let row = 0; row < this.board.length; row++) {
         for (let col = 0; col < this.board[row].length; col++) {
           this.board[row][col].content = ""
           this.board[row][col].hidden = true;
+          this.board[row][col].marked = false;
         }
       }
 
-      for (let i = 0; i < coords.length; i++) {
-        this.board[coords[i][0]][coords[i][1]].content = "💣";
+      for (let i = 0; i < allCoords.length; i++) {
+        this.board[allCoords[i][0]][allCoords[i][1]].content = "💣";
       }
 
       this.setClues();
@@ -202,14 +239,16 @@ var app = new Vue({
       if (!cell.marked) {
         if (cell.content &&
           cell.content != "💣") {
-          return cell.hidden = false;
+          cell.hidden = false;
         } else if (!cell.content) {
           cell.hidden = false;
-          return this.revealAdjacent(row, col); 
+          this.revealAdjacent(row, col); 
         } else {
-          return cell.hidden = false;
+          cell.hidden = false;
         }
       }
+
+      return this.youWin();
     },
     revealAdjacent(row, col) {
       let adjacentCells = [
