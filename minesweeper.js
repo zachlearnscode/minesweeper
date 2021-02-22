@@ -176,19 +176,42 @@ var app = new Vue({
 
       return remaining;
     },
-    reveal(cell) {
-      cell.clicked = true;
-      
-      if (cell.content === "💣") {
-        return console.log("You Lose")
+    reveal(row, col) {
+      let cell = this.board[row][col];
+
+      if (cell.content &&
+          cell.content != "💣") {
+        return cell.clicked = true;
+      } else if (!cell.content) {
+        cell.clicked = true;
+        return this.revealAdjacent(row, col); 
       } else {
-        let remainingCells = this.remainingCells();
-        for (let c = 0; c < remainingCells.length; c++) {
-          if (remainingCells[c].content !== "💣") {
-            return console.log("Keep Playing")
+        return cell.clicked = true;
+      }
+    },
+    revealAdjacent(row, col) {
+      let adjacentCells = [
+        {row: row - 1, col: col - 1},
+        {row: row - 1, col: col},
+        {row: row - 1, col: col + 1},
+        {row: row, col: col + 1},
+        {row: row + 1, col: col + 1},
+        {row: row + 1, col: col},
+        {row: row + 1, col: col - 1},
+        {row: row, col: col - 1}
+      ];
+
+      for (let i = 0; i < adjacentCells.length; i++) {
+        let cell = this.boundsCheck(adjacentCells[i].row, adjacentCells[i].col);
+
+        if (cell) {
+          if (!cell.clicked) {
+            cell.clicked = true;
+            if (!cell.content) {
+              this.revealAdjacent(adjacentCells[i].row, adjacentCells[i].col)
+            }
           }
         }
-        return console.log("You Win!")
       }
     },
     colorCell(row, col, clicked) {
@@ -238,13 +261,18 @@ var app = new Vue({
     boundsCheck(row, col) {
       if (row > -1 && row < this.board.length &&
           col > -1 && col < this.board[row].length) {
-            return this.bombCheck(row, col);
+            return this.board[row][col];
+      } else {
+        return undefined;
       }
     },
-    bombCheck(row, col) {
-      if (this.board[row][col].content === "💣") {
-        return 1;
+    bombCheck(coords) {
+      if (coords) {
+        if (coords.content === "💣") {
+          return 1;
+        } 
       }
+      
     }
   },
   mounted() {
@@ -255,14 +283,14 @@ var app = new Vue({
         if (curr.content === "") {
           let nearbyBombs = 0;
 
-          nearbyBombs += this.boundsCheck(row - 1, col) || 0;
-          nearbyBombs += this.boundsCheck(row + 1, col) || 0;
-          nearbyBombs += this.boundsCheck(row, col - 1) || 0;
-          nearbyBombs += this.boundsCheck(row, col + 1) || 0;
-          nearbyBombs += this.boundsCheck(row - 1, col - 1) || 0;
-          nearbyBombs += this.boundsCheck(row - 1, col + 1) || 0;
-          nearbyBombs += this.boundsCheck(row + 1, col - 1) || 0;
-          nearbyBombs += this.boundsCheck(row + 1, col + 1) || 0;
+          nearbyBombs += this.bombCheck(this.boundsCheck(row - 1, col)) || 0;
+          nearbyBombs += this.bombCheck(this.boundsCheck(row + 1, col)) || 0;
+          nearbyBombs += this.bombCheck(this.boundsCheck(row, col - 1)) || 0;
+          nearbyBombs += this.bombCheck(this.boundsCheck(row, col + 1)) || 0;
+          nearbyBombs += this.bombCheck(this.boundsCheck(row - 1, col - 1)) || 0;
+          nearbyBombs += this.bombCheck(this.boundsCheck(row - 1, col + 1)) || 0;
+          nearbyBombs += this.bombCheck(this.boundsCheck(row + 1, col - 1)) || 0;
+          nearbyBombs += this.bombCheck(this.boundsCheck(row + 1, col + 1)) || 0;
 
           if (nearbyBombs !== 0) {
             curr.content = String(nearbyBombs);

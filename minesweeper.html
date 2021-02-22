@@ -19,15 +19,15 @@
   <div id="app">
     
       <div :style="boardWrapper">
-        <div v-for="(row, iRow) in board" :style="boardRow">
+        <div v-for="(row, rowIndex) in board" :style="boardRow">
           <div
-            v-for="(boardCell, iCell) in row"
+            v-for="(col, colIndex) in row"
             :style="[cell,
-                    colorCell(iRow, iCell, boardCell.clicked),
-                    colorize(boardCell.content)]"
-            @click="reveal(boardCell)"
+                    colorCell(rowIndex, colIndex, col.clicked),
+                    colorize(col.content)]"
+            @click="reveal(rowIndex, colIndex)"
           >
-            {{boardCell.clicked ? boardCell.content : ''}}
+            {{col.clicked ? col.content : ''}}
           </div>
         </div>
       </div>
