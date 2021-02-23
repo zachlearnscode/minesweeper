@@ -1,105 +1,189 @@
+class Gameboard {
+  constructor(rows, cols, bombs) {
+    this.rows = rows;
+    this.cols = cols;
+    this.bombs = bombs;
+    this.board = undefined;
+    this.setup = {
+      frameBoard: () => {
+        let board = [];
+    
+        let x = 0;
+        while (x < this.rows) {
+          let row = [];
+    
+          let y = 0;
+          while (y < this.cols) {
+            row.push(new Cell());
+            y++;
+          }
+    
+          board.push(row);
+          x++;
+        }
+    
+        return board;
+      },
+    
+      coordinateBombs: () => {
+        let bombCoordinates = [];
+    
+        let createCoordinates = () => {
+          let row = Math.floor(Math.random() * this.rows);
+          let col = Math.floor(Math.random() * this.cols);
+    
+          return {row, col};
+        }
+    
+        let preventDuplicates = ({row, col}) => {
+          if (!bombCoordinates.some(c => c.row === row && c.col === col)) {
+            return bombCoordinates.push({row, col})
+          } else {
+            return preventDuplicates(createCoordinates());
+          }
+        }
+    
+        do {
+          preventDuplicates(createCoordinates());
+        } while (bombCoordinates.length < this.bombs);
+
+        return bombCoordinates;
+      },
+    
+      placeBombs: (board, coordinates) => {
+        board = board.slice();
+        coordinates.forEach(coords => board[coords.row][coords.col].content = "💣");
+  
+        return board;
+      },
+    
+      setClues: (board) => {
+        for (let row = 0; row < board.length; row++) {
+          for (let col = 0; col < board[row].length; col++) {
+            let cell = board[row][col], nearbyBombs = 0;
+    
+            function bombCheck({row, col}) {
+              if (board[row][col].content === "💣") {
+                return 1;
+              } else {
+                return 0;
+              }
+            }
+            
+            if (!cell.content) {
+              let neighbors = this.findNeighbors(board, row, col);
+              neighbors.forEach(coords => {
+                nearbyBombs += bombCheck(coords)
+              })
+              
+      
+              if (nearbyBombs !== 0) {
+                cell.content = String(nearbyBombs);
+              }
+            }            
+          }
+        }
+        return board;
+      }
+    }
+  }
+
+  buildBoard() {
+    let frame = this.setup.frameBoard();
+    let bombCoordinates = this.setup.coordinateBombs();
+
+    let board = this.setup.setClues(this.setup.placeBombs(frame, bombCoordinates));
+
+    return this.board = board;
+  }
+
+  reveal(row, col) {
+    let cell = this.board[row][col];
+
+    if (!cell.marked) {
+      cell.hidden = false;
+
+      if (cell.content === "💣") {
+        return this.gameOver()
+      } else if (!cell.content) {
+        this.revealNeighbors(this.board, row, col);
+      }
+
+      return this.evaluateForWin();
+    }
+  }
+
+  evaluateForWin() {
+    let remainingCells = this.board.flat()
+      .filter(c => c.hidden);
+
+    if (remainingCells.some(c => !c.content || c.content != "💣")) {
+      return console.log("Keep Playing")
+    } else {
+      return console.log("You Win!")
+    }
+  }
+
+  gameOver() {
+    return console.log("Game Over")
+  }
+
+  revealNeighbors(board, row, col) {
+    let neighborCoords = this.findNeighbors(board, row, col);
+
+    neighborCoords.forEach(coords => {
+      let neighbor = this.board[coords.row][coords.col];
+
+      if (neighbor.hidden && !neighbor.marked) {
+        neighbor.hidden = false;
+        if (!neighbor.content)
+        this.revealNeighbors(this.board, coords.row, coords.col);
+      }
+    })
+  }
+
+  boundsCheck(board, row, col) {
+    if (row > -1 && row < board.length &&
+        col > -1 && col < board[row].length) {
+          return {row, col};
+    } else {
+      return undefined;
+    }
+  }
+
+  findNeighbors(board, row, col) {
+    let inboundsNeighbors = [];
+    let possibleNeighbors = [
+      {row: row - 1, col: col - 1},
+      {row: row - 1, col: col},
+      {row: row - 1, col: col + 1},
+      {row: row, col: col + 1},
+      {row: row + 1, col: col + 1},
+      {row: row + 1, col: col},
+      {row: row + 1, col: col - 1},
+      {row: row, col: col - 1}
+    ];
+
+    possibleNeighbors.forEach(c => inboundsNeighbors.push(this.boundsCheck(board, c.row, c.col)));
+    
+    return inboundsNeighbors.filter(neighbor => neighbor);
+  }
+}
+
+class Cell {
+  constructor() {
+    this.content = "";
+    this.hidden = true;
+    this.marked = false;
+  }
+}
+
 var app = new Vue({
   el: '#app',
   data: {
-    board: [
-      [
-        {content: "", hidden: true, marked: false},
-        {content: "💣", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false},
-        {content: "💣", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false}
-      ],
-      [
-        {content: "", hidden: true, marked: false},
-        {content: "💣", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false}
-      ],
-      [
-        {content: "", hidden: true, marked: false},
-        {content: "💣", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false}
-      ],
-      [
-        {content: "", hidden: true, marked: false},
-        {content: "💣", hidden: true, marked: false},
-        {content: "💣", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false}
-      ],
-      [
-        {content: "💣", hidden: true, marked: false},
-        {content: "💣", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false}
-      ],
-      [
-        {content: "", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false}
-      ],
-      [
-        {content: "", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false},
-        {content: "💣", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false}
-      ],
-      [
-        {content: "", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false},
-        {content: "💣", hidden: true, marked: false},
-        {content: "", hidden: true, marked: false}
-      ]
-    ],
-    numBombs: 10,
+    gameObj: undefined,
+    gameboard: undefined,
+    seconds: 0,
     interfaceWrapper: {
       
       width: "10rem",
@@ -162,118 +246,24 @@ var app = new Vue({
     },
     revealedEven: {
       background: '#D6D6D6'
-    },
-    seconds: 0
-  },
-  computed: {
-    hiddenCells() {
-      return this.board.flat().filter(c => c.hidden);
     }
   },
+  computed: {
+    flagsRemaining() {
+      let markedCells = this.gameboard.flat()
+        .filter(c => c.marked).length;
+
+      return this.gameObj.bombs - markedCells;
+    },
+    
+  },
   methods: {
-    timeElapsed() {
-      if (this.board.flat()
-            .some(c => !c.hidden)) {
-        
-        return this.seconds = setInterval(() => this.seconds++, 1000)
-      } else {
-        return 0
-      }
-    },
-    youWin() {
-      if (this.hiddenCells.length === 10 &&
-          this.hiddenCells.every(c => c.content === "💣")) {
-        return console.log("You win")
-      }
-    },
     newGame() {
-      let allCoords = []; counter = 0;
-      while (counter < 10) {
-        function createCoords() {
-          let row = Math.floor((Math.random() * 7) + 1);
-          let col = Math.floor((Math.random() * 9) + 1);
-          return [row, col];
-        }
+      this.gameObj = new Gameboard(8, 10, 10);
+      this.gameObj.buildBoard();
 
-        function checkCoords(coords) {
-          if (!allCoords.some(c => c[0] === coords[0] && c[1] === coords[1])) {
-            return allCoords.push(coords);
-          } else {
-            return checkCoords(createCoords());
-          }
-        }
+      return this.gameboard = this.gameObj.board;
 
-        checkCoords(createCoords());
-        counter++;
-      }
-
-      for (let row = 0; row < this.board.length; row++) {
-        for (let col = 0; col < this.board[row].length; col++) {
-          this.board[row][col].content = ""
-          this.board[row][col].hidden = true;
-          this.board[row][col].marked = false;
-        }
-      }
-
-      for (let i = 0; i < allCoords.length; i++) {
-        this.board[allCoords[i][0]][allCoords[i][1]].content = "💣";
-      }
-
-      this.setClues();
-    },
-    remainingCells() {
-      let remaining = [];
-      let board = this.board.flat();
-
-      for (let i = 0; i < board.length; i++) {
-        if (!board[i].clicked) {
-          remaining.push(board[i]);
-        }
-      }
-
-      return remaining;
-    },
-    reveal(row, col) {
-      let cell = this.board[row][col];
-
-      if (!cell.marked) {
-        if (cell.content &&
-          cell.content != "💣") {
-          cell.hidden = false;
-        } else if (!cell.content) {
-          cell.hidden = false;
-          this.revealAdjacent(row, col); 
-        } else {
-          cell.hidden = false;
-        }
-      }
-
-      return this.youWin();
-    },
-    revealAdjacent(row, col) {
-      let adjacentCells = [
-        {row: row - 1, col: col - 1},
-        {row: row - 1, col: col},
-        {row: row - 1, col: col + 1},
-        {row: row, col: col + 1},
-        {row: row + 1, col: col + 1},
-        {row: row + 1, col: col},
-        {row: row + 1, col: col - 1},
-        {row: row, col: col - 1}
-      ];
-
-      for (let i = 0; i < adjacentCells.length; i++) {
-        let cell = this.boundsCheck(adjacentCells[i].row, adjacentCells[i].col);
-
-        if (cell) {
-          if (cell.hidden && !cell.marked) {
-            cell.hidden = false;
-            if (!cell.content) {
-              this.revealAdjacent(adjacentCells[i].row, adjacentCells[i].col)
-            }
-          }
-        }
-      }
     },
     colorCell(row, col, hidden) {
       if (row % 2 === 0) {
@@ -318,48 +308,6 @@ var app = new Vue({
       } else {
         return '';
       }
-    },
-    boundsCheck(row, col) {
-      if (row > -1 && row < this.board.length &&
-          col > -1 && col < this.board[row].length) {
-            return this.board[row][col];
-      } else {
-        return undefined;
-      }
-    },
-    bombCheck(coords) {
-      if (coords) {
-        if (coords.content === "💣") {
-          return 1;
-        } 
-      }
-    },
-    setClues() {
-      for (let row = 0; row < this.board.length; row++) {
-        for (let col = 0; col < this.board[row].length; col++) {
-  
-          let curr = this.board[row][col];
-          if (curr.content === "") {
-            let nearbyBombs = 0;
-  
-            nearbyBombs += this.bombCheck(this.boundsCheck(row - 1, col)) || 0;
-            nearbyBombs += this.bombCheck(this.boundsCheck(row + 1, col)) || 0;
-            nearbyBombs += this.bombCheck(this.boundsCheck(row, col - 1)) || 0;
-            nearbyBombs += this.bombCheck(this.boundsCheck(row, col + 1)) || 0;
-            nearbyBombs += this.bombCheck(this.boundsCheck(row - 1, col - 1)) || 0;
-            nearbyBombs += this.bombCheck(this.boundsCheck(row - 1, col + 1)) || 0;
-            nearbyBombs += this.bombCheck(this.boundsCheck(row + 1, col - 1)) || 0;
-            nearbyBombs += this.bombCheck(this.boundsCheck(row + 1, col + 1)) || 0;
-  
-            if (nearbyBombs !== 0) {
-              curr.content = String(nearbyBombs);
-            }
-          }
-        }
-      }
     }
-  },
-  mounted() {
-    this.setClues();
   }
 })

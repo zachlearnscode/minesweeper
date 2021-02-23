@@ -29,34 +29,32 @@ class Gameboard {
         let bombCoordinates = [];
     
         let createCoordinates = () => {
-          let row = Math.floor(Math.random() * this.rows);
-          let col = Math.floor(Math.random() * this.cols);
+          let row = Math.round(Math.random() * this.rows);
+          let col = Math.round(Math.random() * this.cols);
     
           return {row, col};
         }
     
-        let preventDuplicate = ({row, col}) => {
+        let preventDuplicates = ({row, col}) => {
           if (!bombCoordinates.some(c => c.row === row && c.col === col)) {
             return bombCoordinates.push({row, col})
           } else {
-            return preventDuplicate(createCoordinates());
+            return preventDuplicates(createCoordinates());
           }
         }
     
         do {
-          bombCoordinates.push(createCoordinates())
-        } while (bombCoordinates.length < this.bombs - 1) {
-          preventDuplicate(createCoordinates());
-        }
-        console.log(bombCoordinates)
+          preventDuplicates(createCoordinates());
+        } while (bombCoordinates.length < this.bombs);
+
         return bombCoordinates;
       },
     
       placeBombs: (board, coordinates) => {
-          board = board.slice();
-          coordinates.forEach(coords => board[coords.row][coords.col].content = "💣");
-    
-          return board;
+        board = board.slice();
+        coordinates.forEach(coords => board[coords.row][coords.col].content = "💣");
+  
+        return board;
       },
     
       setClues: (board) => {
@@ -77,7 +75,6 @@ class Gameboard {
               neighbors.forEach(coords => {
                 nearbyBombs += bombCheck(coords)
               })
-              
       
               if (nearbyBombs !== 0) {
                 cell.content = String(nearbyBombs);
@@ -96,8 +93,32 @@ class Gameboard {
 
     let board = this.setup.setClues(this.setup.placeBombs(frame, bombCoordinates));
 
-    return board;
+    return this.board = board;
   }
+
+  reveal(row, col) {
+    let cell = this.board[row][col];
+
+    cell.hidden = false;
+
+    // if (!cell.content) {
+    //   return this.revealNeighbors(this.board, row, col);
+    // }
+  }
+
+  // revealNeighbors(board, row, col) {
+  //   let neighborCoords = this.findNeighbors(board, row, col);
+
+  //   neighborCoords.forEach(coords => {
+  //     let neighbor = this.board[coords.row][coords.col];
+
+  //     if (neighbor.hidden && !neighbor.marked) {
+  //       neighbor.hidden = false;
+  //       if (!neighbor.content)
+  //       this.revealNeighbors(this.board, coords.row, coords.col);
+  //     }
+  //   })
+  // }
 
   boundsCheck(board, row, col) {
     if (row > -1 && row < board.length &&
@@ -123,7 +144,7 @@ class Gameboard {
 
     possibleNeighbors.forEach(c => inboundsNeighbors.push(this.boundsCheck(board, c.row, c.col)));
     
-    return inboundsNeighbors.filter(n => n);
+    return inboundsNeighbors.filter(neighbor => neighbor);
     
   }
 }
@@ -139,4 +160,5 @@ class Cell {
 let easyBoard = new Gameboard(8, 10, 10)
 
 
-console.log(easyBoard.buildBoard())
+
+console.log(easyBoard.board)

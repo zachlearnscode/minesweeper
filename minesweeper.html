@@ -18,14 +18,14 @@
 <body>
   <div id="app">
     
-    <div :style="boardWrapper">
-      <div v-for="(row, rowIndex) in board" :style="boardRow">
+    <div :style="boardWrapper" v-if="gameboard">
+      <div v-for="(row, rowIndex) in gameboard" :style="boardRow">
         <div
           v-for="(col, colIndex) in row"
           :style="[cell,
                   colorCell(rowIndex, colIndex, col.hidden),
                   colorize(col.content)]"
-          @click="reveal(rowIndex, colIndex)"
+          @click="gameObj.reveal(rowIndex, colIndex)"
           @click.right.prevent="col.marked = !col.marked"
         >
           {{ col.hidden ? col.marked ? '🚩' : '' : col.content }}
@@ -35,11 +35,13 @@
 
     <div style="display:flex">
       <button type="button" @click="newGame">New Game</button>
-      <div style="display:flex;align-items:center">
-        <span> 🚩 </span> <span> {{ numBombs - board.flat().filter(c => c.marked).length }} </span>
-      </div>
-      <div style="display:flex;align-items:center">
-        <span> ⏲️ </span> <span> {{ timeElapsed() }} </span>
+      <div v-if="gameboard">
+        <div style="display:flex;align-items:center">
+          <span> 🚩 </span> <span>{{flagsRemaining}}</span>
+        </div>
+        <div style="display:flex;align-items:center">
+          <span> ⏲️ </span> <span> {{ timeElapsed() }} </span>
+        </div>
       </div>
     </div>
 
