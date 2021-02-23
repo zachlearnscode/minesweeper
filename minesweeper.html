@@ -34,13 +34,27 @@
     </div>
 
     <div style="display:flex">
-      <button type="button" @click="newGame">New Game</button>
+      <form @submit.prevent="newGame">
+        <select name="difficulty" id="difficulty" v-model="difficulty">
+          <option value="easy">Easy</option>
+          <option value="medium">Medium</option>
+          <option value="hard">Hard</option>
+        </select>
+        <button type="submit">New Game</button>
+      </form>
+
+    
+
+
+
       <div v-if="gameboard">
         <div style="display:flex;align-items:center">
-          <span> 🚩 </span> <span>{{flagsRemaining}}</span>
+          <span> 🚩 </span> <span>{{ flagsRemaining }}</span>
         </div>
         <div style="display:flex;align-items:center">
-          <span> ⏲️ </span> <span> {{ timeElapsed() }} </span>
+          <span> ⏲️ </span>
+          <span> {{timeElapsed}} </span>
+          
         </div>
       </div>
     </div>

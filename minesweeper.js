@@ -104,7 +104,7 @@ class Gameboard {
       cell.hidden = false;
 
       if (cell.content === "💣") {
-        return this.gameOver()
+        return this.gameOver(cell)
       } else if (!cell.content) {
         this.revealNeighbors(this.board, row, col);
       }
@@ -117,15 +117,27 @@ class Gameboard {
     let remainingCells = this.board.flat()
       .filter(c => c.hidden);
 
-    if (remainingCells.some(c => !c.content || c.content != "💣")) {
-      return console.log("Keep Playing")
+    if (remainingCells.some(c => !c.content || c.content !== "💣")) {
+      return;
     } else {
-      return console.log("You Win!")
+      return this.gameWon(remainingCells);
     }
   }
 
-  gameOver() {
-    return console.log("Game Over")
+  gameOver(cell) {
+    let allBombs = this.board.flat()
+      .filter(c => c.content === "💣");
+
+    allBombs.forEach(b => b.hidden = false);
+
+    cell.content = "❌";
+  }
+
+  gameWon(arr) {
+    arr.forEach(c => {
+      c.marked = false;
+      c.hidden = false;
+    })
   }
 
   revealNeighbors(board, row, col) {
@@ -183,7 +195,8 @@ var app = new Vue({
   data: {
     gameObj: undefined,
     gameboard: undefined,
-    seconds: 0,
+    difficulty: "medium",
+    timeElapsed: 0,
     interfaceWrapper: {
       
       width: "10rem",
@@ -254,16 +267,29 @@ var app = new Vue({
         .filter(c => c.marked).length;
 
       return this.gameObj.bombs - markedCells;
-    },
-    
+    }
   },
   methods: {
     newGame() {
-      this.gameObj = new Gameboard(8, 10, 10);
+      if (this.difficulty === "easy") {
+        this.gameObj = new Gameboard(8, 10, 10);
+      } else if (this.difficulty === "medium") {
+        this.gameObj = new Gameboard(14, 18, 40);
+      } else {
+        this.gameObj = new Gameboard(20, 24, 99);
+      }
+      
       this.gameObj.buildBoard();
 
       return this.gameboard = this.gameObj.board;
-
+    },
+    startTimer() {
+      this.countInterval = setInterval(() => {
+        this.timeElapsed++;
+      }, 1000);
+    },
+    stopTimer() {
+      clearInterval(this.countInterval);
     },
     colorCell(row, col, hidden) {
       if (row % 2 === 0) {
