@@ -10,25 +10,25 @@
   <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
   <style>
     * {
-
       box-sizing: border-box;
     }
   </style>
 </head>
 <body>
   <div id="app">
-    
-    <div :style="boardWrapper" v-if="gameboard">
-      <div v-for="(row, rowIndex) in gameboard" :style="boardRow">
-        <div
-          v-for="(col, colIndex) in row"
-          :style="[cell,
-                  colorCell(rowIndex, colIndex, col.hidden),
-                  colorize(col.content)]"
-          @click="gameObj.reveal(rowIndex, colIndex)"
-          @click.right.prevent="col.marked = !col.marked"
-        >
-          {{ col.hidden ? col.marked ? '🚩' : '' : col.content }}
+    <div v-if="gameboard">
+      <div :style="styles.board">
+        <div v-for="(row, rowIndex) in gameboard" :style="styles.row">
+          <div
+            v-for="(col, colIndex) in row"
+            :style="[styles.cell,
+                    styles.colorizeCell(rowIndex, colIndex, col.hidden),
+                    styles.colorizeClues(col.content)]"
+            @click="gameObj.reveal(rowIndex, colIndex)"
+            @click.right.prevent="col.marked = !col.marked"
+          >
+            {{ col.hidden ? col.marked ? '🚩' : '' : col.content }}
+          </div>
         </div>
       </div>
     </div>
@@ -37,7 +37,7 @@
       <form @submit.prevent="newGame">
         <select name="difficulty" id="difficulty" v-model="difficulty">
           <option value="easy">Easy</option>
-          <option value="medium">Medium</option>
+          <option value="medium" selected>Medium</option>
           <option value="hard">Hard</option>
         </select>
         <button type="submit">New Game</button>

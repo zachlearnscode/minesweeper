@@ -4,6 +4,7 @@ class Gameboard {
     this.cols = cols;
     this.bombs = bombs;
     this.board = undefined;
+    this.playing = false;
     this.setup = {
       frameBoard: () => {
         let board = [];
@@ -99,6 +100,10 @@ class Gameboard {
 
   reveal(row, col) {
     let cell = this.board[row][col];
+
+    if (!this.playing) {
+      this.playing = true;
+    }
 
     if (!cell.marked) {
       cell.hidden = false;
@@ -197,69 +202,7 @@ var app = new Vue({
     gameboard: undefined,
     difficulty: "medium",
     timeElapsed: 0,
-    interfaceWrapper: {
-      
-      width: "10rem",
-      backgroundColor: "#D6D6D6",
-      borderStyle: "outset",
-      borderWidth: "3px",
-      padding: '.5rem'
-    },
-    gameHeader: {
-      display: 'flex',
-      justifyContent: 'between',
-      alignItems: 'center',
-      width: '10rem',
-      height: '2rem'
-    },
-    boardWrapper: {
-      width: '20rem',
-      height: `calc(20rem * .8)`,
-      background: '#D6D6D6',
-      display: 'grid',
-      gridTemplateColumns: '1fr'
-    },
-    boardRow: {
-      width: '20rem',
-      height: '2rem',
-      display: 'flex'
-    },
-    cell: {
-      width: '2rem',
-      height: '2rem',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      fontFamily: "VT323, monospace"
-    },
-    hiddenDark: {
-      backgroundColor: '#33CC33'
-    },
-    hiddenLight: {
-      backgroundColor: '#66FF66'
-    },
-    revealedDark: {
-      backgroundColor: '#FFCC00'
-    },
-    revealedLight: {
-      backgroundColor: '#FFCC66'
-    },
-    fontStyles: {
-      size: {fontSize: "1.7rem"},
-      blue: {color: 'blue'},
-      green: {color: 'green'},
-      red: {color: "red"},
-      darkBlue: {color: "darkblue"}
-    },
-    hidden: {
-      background: '#D6D6D6'
-    },
-    revealedOdd: {
-      background: '#E3E3E3'
-    },
-    revealedEven: {
-      background: '#D6D6D6'
-    }
+    interval: null
   },
   computed: {
     flagsRemaining() {
@@ -267,7 +210,89 @@ var app = new Vue({
         .filter(c => c.marked).length;
 
       return this.gameObj.bombs - markedCells;
-    }
+    },
+    styles() {
+      return {
+        board: {
+          display: "grid",
+          gridTemplateRows: `repeat(${this.gameObj.rows}, 50px)`
+          //Make 1fr a static value to end responsiveness
+        },
+        row: {
+          aspectRatio: `${this.gameObj.cols}/1`,
+          display: 'grid',
+          gridTemplateColumns: `repeat(${this.gameObj.cols}, 1fr)`
+        },
+        cell: {
+          aspectRatio: "1/1",
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          fontFamily: "VT323, monospace"
+        },
+        colorizeCell: (row, col, hidden) => {
+          if (row % 2 === 0) {
+            if (col % 2 === 0) {
+              if (hidden) {
+                return {backgroundColor: '#33CC33'};
+              } else {
+                return {backgroundColor: '#FFCC00'};
+              }
+            } else {
+              if (hidden) {
+                return {backgroundColor: '#66FF66'};
+              } else {
+                return {backgroundColor: '#FFCC66'};
+              }
+            }
+          } else {
+            if (col % 2 === 0) {
+              if (hidden) {
+                return {backgroundColor: '#66FF66'};
+              } else {
+                return {backgroundColor: '#FFCC66'};
+              }
+            } else {
+              if (hidden) {
+                return {backgroundColor: '#33CC33'};
+              } else {
+                return {backgroundColor: '#FFCC00'};
+              }
+            }
+          }
+        },
+        colorizeClues: (clueVal) => {
+          if (Number(clueVal) === 1) {
+            return {color: 'blue'};
+          } else if (Number(clueVal) === 2) {
+            return {color: 'green'};
+          } else if (Number(clueVal) === 3) {
+            return {color: 'red'};
+          } else if (Number(clueVal) === 4) {
+            return {color: 'darkBlue'};
+          } else if (Number(clueVal) === 5) {
+            return {color: 'maroon'};
+          } else if (Number(clueVal) === 6) {
+            return {color: 'lightSeaGreen'};
+          } else if (Number(clueVal) === 7) {
+            return {color: 'black'};
+          } else if (Number(clueVal) === 8) {
+            return {color: 'gray'};
+          } 
+        }
+      }
+    },
+    // startTimer() {
+    //   if (this.gameObj.playing) {
+    //     var self = this;
+    //     this.interval = setTimeout(function tick() {
+    //       self.timeElapsed++;
+    //       setTimeout(tick, 1000)
+    //     }, 1000);
+    //   } else {
+    //     return clearInterval(this.countInterval);
+    //   }
+    // }
   },
   methods: {
     newGame() {
@@ -283,57 +308,8 @@ var app = new Vue({
 
       return this.gameboard = this.gameObj.board;
     },
-    startTimer() {
-      this.countInterval = setInterval(() => {
-        this.timeElapsed++;
-      }, 1000);
-    },
     stopTimer() {
       clearInterval(this.countInterval);
-    },
-    colorCell(row, col, hidden) {
-      if (row % 2 === 0) {
-        if (col % 2 === 0) {
-          if (hidden) {
-            return this.hiddenDark;
-          } else {
-            return this.revealedDark;
-          }
-        } else {
-          if (hidden) {
-            return this.hiddenLight;
-          } else {
-            return this.revealedLight;
-          }
-        }
-      } else {
-        if (col % 2 === 0) {
-          if (hidden) {
-            return this.hiddenLight;
-          } else {
-            return this.revealedLight;
-          }
-        } else {
-          if (hidden) {
-            return this.hiddenDark;
-          } else {
-            return this.revealedDark;
-          }
-        }
-      }
-    },
-    colorize(num) {
-      if (Number(num) === 1) {
-        return this.fontStyles.blue;
-      } else if (Number(num) === 2) {
-        return this.fontStyles.green;
-      } else if (Number(num) === 3) {
-        return this.fontStyles.red;
-      } else if (Number(num) === 4) {
-        return this.fontStyles.darkBlue;
-      } else {
-        return '';
-      }
     }
   }
 })
