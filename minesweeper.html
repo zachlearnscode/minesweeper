@@ -16,15 +16,15 @@
 </head>
 <body>
   <div id="app">
-    <div v-if="gameboard">
+    <div v-if="board">
       <div :style="styles.board">
-        <div v-for="(row, rowIndex) in gameboard" :style="styles.row">
+        <div v-for="(row, rowIndex) in board" :style="styles.row">
           <div
             v-for="(col, colIndex) in row"
             :style="[styles.cell,
                     styles.colorizeCell(rowIndex, colIndex, col.hidden),
                     styles.colorizeClues(col.content)]"
-            @click="gameObj.reveal(rowIndex, colIndex)"
+            @click="reveal(rowIndex, colIndex)"
             @click.right.prevent="col.marked = !col.marked"
           >
             {{ col.hidden ? col.marked ? '🚩' : '' : col.content }}
@@ -47,9 +47,9 @@
 
 
 
-      <div v-if="gameboard">
+      <div v-if="board">
         <div style="display:flex;align-items:center">
-          <span> 🚩 </span> <span>{{ flagsRemaining }}</span>
+          <span> 🚩 </span> <span>{{ flagsAvailable }}</span>
         </div>
         <div style="display:flex;align-items:center">
           <span> ⏲️ </span>
