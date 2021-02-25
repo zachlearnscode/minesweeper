@@ -6,16 +6,41 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Minesweeper</title>
   <link rel="preconnect" href="https://fonts.gstatic.com">
-  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@500&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
   <style>
     * {
+      margin: 0;
+      padding: 0;
       box-sizing: border-box;
     }
   </style>
 </head>
-<body>
+<body style="background-color: #62993a;">
   <div id="app">
+    <div style="background-color: #4a752c; width: 100vw; height: 3rem;font-size:1.5rem; padding: 0px 10px; display:flex; align-items: center; justify-content: space-between;">
+      <form @submit.prevent="newGame">
+        <select name="difficulty" id="difficulty" v-model="difficulty">
+          <option value="easy">Easy</option>
+          <option value="medium" selected>Medium</option>
+          <option value="hard">Hard</option>
+        </select>
+        <button type="submit">New Game</button>
+      </form>
+      <div>
+        <div style="display:flex;align-items:center">
+          <div style="margin-right:10px">
+            <span>🚩</span>
+            <span style="font-family: Rubik, sans-serif;color:white">{{ flagsAvailable }}</span>
+          </div>
+          <div>
+            <span>⏲️</span>
+            <span style="font-family: Rubik, sans-serif;color:white;"> {{ timeElapsed | padTime}} </span>
+          </div>
+        </div>
+      </div>
+    </div>
     <div v-if="board">
       <div :style="styles.board">
         <div v-for="(row, rowIndex) in board" :style="styles.row">
@@ -32,34 +57,6 @@
         </div>
       </div>
     </div>
-
-    <div style="display:flex">
-      <form @submit.prevent="newGame">
-        <select name="difficulty" id="difficulty" v-model="difficulty">
-          <option value="easy">Easy</option>
-          <option value="medium" selected>Medium</option>
-          <option value="hard">Hard</option>
-        </select>
-        <button type="submit">New Game</button>
-      </form>
-
-    
-
-
-
-      <div v-if="board">
-        <div style="display:flex;align-items:center">
-          <span> 🚩 </span> <span>{{ flagsAvailable }}</span>
-        </div>
-        <div style="display:flex;align-items:center">
-          <span> ⏲️ </span>
-          <span> {{timeElapsed}} </span>
-          
-        </div>
-      </div>
-    </div>
-
-
   </div>
   <script src="minesweeper.js"></script>
 </body>
