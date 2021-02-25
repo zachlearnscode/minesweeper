@@ -11,39 +11,49 @@ var app = new Vue({
     interval: null
   },
   methods: {
-    buildBoard() {
-      let frameBoard = () => {
-        let board = [];
-    
-        let x = 0;
-        while (x < this.rows) {
-          let row = [];
-    
-          let y = 0;
-          while (y < this.cols) {
-            row.push({content: "", hidden: true, marked: false});
-            y++;
-          }
-    
-          board.push(row);
-          x++;
+    frameBoard() {
+      let board = [];
+  
+      let x = 0;
+      while (x < this.rows) {
+        let row = [];
+  
+        let y = 0;
+        while (y < this.cols) {
+          row.push({content: "", hidden: true, marked: false});
+          y++;
         }
-    
-        return board;
+  
+        board.push(row);
+        x++;
       }
-    
+  
+      return board;
+    },
+    finishBoard(row, col) {
+      let board = this.board.slice();
+      let givenRow = row, givenCol = col;
+      let revealedCellNeighbors = this.findNeighbors(board, row, col);
+
       let coordinateBombs = () => {
         let bombCoordinates = [];
     
         let createCoordinates = () => {
           let row = Math.floor(Math.random() * this.rows);
           let col = Math.floor(Math.random() * this.cols);
-    
-          return {row, col};
+
+          if (!revealedCellNeighbors
+                .some(n => n.row === row && n.col === col) &&
+                row !== givenRow && col !== givenCol) {
+            return {row, col};
+          } else {
+            return createCoordinates();
+          }
         }
     
         let preventDuplicates = ({row, col}) => {
-          if (!bombCoordinates.some(c => c.row === row && c.col === col)) {
+          if (!bombCoordinates
+                .some(c => c.row === row && c.col === col)) {
             return bombCoordinates.push({row, col})
           } else {
             return preventDuplicates(createCoordinates());
@@ -53,18 +63,16 @@ var app = new Vue({
         do {
           preventDuplicates(createCoordinates());
         } while (bombCoordinates.length < this.bombs);
-
+  
         return bombCoordinates;
       }
     
-      let placeBombs = (board, coordinates) => {
-        board = board.slice();
-        coordinates.forEach(coords => board[coords.row][coords.col].content = "💣");
-  
-        return board;
+      let placeBombs = (coordinates) => {
+        return coordinates
+          .forEach(coords => board[coords.row][coords.col].content = "💣");
       }
     
-      let setClues = (board) => {
+      let setClues = () => {
         for (let row = 0; row < board.length; row++) {
           for (let col = 0; col < board[row].length; col++) {
             let cell = board[row][col], nearbyBombs = 0;
@@ -90,24 +98,22 @@ var app = new Vue({
             }            
           }
         }
-        return board;
       }
 
-      let frame = frameBoard();
-      let bombCoordinates = coordinateBombs();
-
-      let board = setClues(placeBombs(frame, bombCoordinates));
+      placeBombs(coordinateBombs());
+      setClues();
 
       return board;
 
     },
     reveal(row, col) {
-      let cell = this.board[row][col];
-  
       if (!this.gameStarted) {
+        this.board = this.finishBoard(row, col);
         this.gameStarted = true;
         this.startTimer();
       }
+
+      let cell = this.board[row][col];
   
       if (!cell.marked) {
         cell.hidden = false;
@@ -205,7 +211,7 @@ var app = new Vue({
         this.bombs = 99;
       }
 
-      let board = this.buildBoard();
+      let board = this.frameBoard();
       
       return this.board = board;
     },
@@ -234,8 +240,9 @@ var app = new Vue({
     styles() {
       return {
         board: {
-          margin: '2rem',
+          margin: '2rem auto',
           aspectRatio: `${this.cols}/${this.rows}`,
+          maxHeight: `calc(100vh - 7rem)`,
           display: "grid",
           gridTemplateRows: `repeat(${this.rows}, 1fr)`,
           boxShadow: '10px 10px 10px #4a752c'
@@ -250,7 +257,7 @@ var app = new Vue({
           justifyContent: 'center',
           alignItems: 'center',
           fontFamily: "Rubik, sans-serif",
-          fontSize: '2rem'
+          fontSize: '1.5rem'
         },
         colorizeCell: (row, col, hidden) => {
           if (row % 2 === 0) {
