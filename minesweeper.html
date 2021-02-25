@@ -7,7 +7,11 @@
   <title>Minesweeper</title>
   <link rel="preconnect" href="https://fonts.gstatic.com">
   <link rel="preconnect" href="https://fonts.gstatic.com">
-<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@500&display=swap" rel="stylesheet">
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+  />
   <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
   <style>
     * {
@@ -17,8 +21,8 @@
     }
   </style>
 </head>
-<body style="background-color: #62993a;">
-  <div id="app">
+<body style="background-color: #62993a;overflow: hidden;">
+  <div id="app" >
     <div style="background-color: #4a752c; width: 100vw; height: 3rem;font-size:1.5rem; padding: 0px 10px; display:flex; align-items: center; justify-content: space-between;">
       <form @submit.prevent="newGame">
         <select name="difficulty" id="difficulty" v-model="difficulty">
@@ -41,22 +45,24 @@
         </div>
       </div>
     </div>
-    <div>
-      <div :style="styles.board">
-        <div v-for="(row, rowIndex) in board" :style="styles.row">
-          <div
-            v-for="(col, colIndex) in row"
-            :style="[styles.cell,
-                    styles.colorizeCell(rowIndex, colIndex, col.hidden),
-                    styles.colorizeClues(col.content)]"
-            @click="reveal(rowIndex, colIndex)"
-            @click.right.prevent="col.marked = !col.marked"
-          >
-            {{ col.hidden ? col.marked ? '🚩' : '' : col.content }}
+    <transition appear name="transition" enter-active-class="animate__animated animate__jackInTheBox" >
+      <div :key="boardKey">
+        <div :style="styles.board">
+          <div v-for="(row, rowIndex) in board" :style="styles.row">
+            <div
+              v-for="(col, colIndex) in row"
+              :style="[styles.cell,
+                      styles.colorizeCell(rowIndex, colIndex, col.hidden),
+                      styles.colorizeClues(col.content)]"
+              @click="reveal(rowIndex, colIndex)"
+              @click.right.prevent="col.marked = !col.marked"
+            >
+              {{ col.hidden ? col.marked ? '🚩' : '' : col.content }}
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </transition>
   </div>
   <script src="minesweeper.js"></script>
 </body>

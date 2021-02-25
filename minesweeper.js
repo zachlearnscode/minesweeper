@@ -5,6 +5,7 @@ var app = new Vue({
     cols: undefined,
     bombs:  undefined,
     board: undefined,
+    boardKey: 0,
     difficulty: "medium",
     gameStarted: false,
     timeElapsed: 0,
@@ -191,6 +192,8 @@ var app = new Vue({
       return inboundsNeighbors.filter(neighbor => neighbor);
     },
     newGame() {
+      this.boardKey++;
+
       if (this.interval) {
         this.stopTimer();
         this.gameStarted = false;
