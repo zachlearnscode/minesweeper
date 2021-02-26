@@ -48,14 +48,17 @@
     <transition appear name="transition" enter-active-class="animate__animated animate__jackInTheBox" >
       <div :key="boardKey">
         <div :style="styles.board">
-          <div v-for="(row, rowIndex) in board" :style="styles.row">
+          <div v-for="(row, rowIndex) in board" :key="rowIndex" :data-index="rowIndex" :style="styles.row">
             <div
-              v-for="(col, colIndex) in row"
+              v-for="(col, colIndex) in row" :key="Number(String(rowIndex) + String(colIndex))" ref="cell"
+              :data-index="String(String(rowIndex) + String(colIndex))"
               :style="[styles.cell,
                       styles.colorizeCell(rowIndex, colIndex, col.hidden),
                       styles.colorizeClues(col.content)]"
               @click="reveal(rowIndex, colIndex)"
               @click.right.prevent="col.marked = !col.marked"
+              @mouseover="lighten(colIndex + (rowIndex * cols))"
+              @mouseleave="restore(colIndex + (rowIndex * cols))"
             >
               {{ col.hidden ? col.marked ? '🚩' : '' : col.content }}
             </div>

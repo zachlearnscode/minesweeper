@@ -225,6 +225,14 @@ var app = new Vue({
     },
     stopTimer() {
       clearInterval(this.interval);
+    },
+    lighten(index) {
+      let cell = this.$refs.cell[index];
+      cell.style.opacity = "75%";
+    },
+    restore(index) {
+      let cell = this.$refs.cell[index];
+      return cell.style.opacity = "100%";
     }
   },
   computed: {
