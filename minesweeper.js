@@ -307,21 +307,22 @@ var app = new Vue({
     bombCells() {
       return this.board.flat().filter(c => c.content === "💣");
     },
-    maxHeight() {
-      return (1 - ((this.cols / this.rows) % 1)) * 100;
+    heightInPixels() {
+      return document.getElementById("board").clientHeight;
     },
     styles() {
       return {
         wrapper: {
           height: 'calc(100vh - 3rem)',
-          width: '100vw',
+          width: `100vw`,
           display: 'flex',
           justifyContent:'center',
-          alignItems: 'center'
+          alignItems: 'center',
+          padding: '1rem'
         },
         board: {
-          minWidth: `calc(350px * ${this.cols / this.rows}`,
-          minHeight: '350px',
+          height: this.isMobile ? `calc(90vw * ${this.rows/this.cols})` : '80vh',
+          width: this.isMobile ? '90vw' : `calc(80vh * ${this.cols/this.rows})`,
           display: "grid",
           gridTemplateRows: `repeat(${this.rows}, 1fr)`,
           boxShadow: '10px 10px 10px #4a752c'
@@ -331,12 +332,11 @@ var app = new Vue({
           gridTemplateColumns: `repeat(${this.cols}, 1fr)`
         },
         cell: {
-          aspectRatio: '1/1',
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
           fontFamily: "Rubik, sans-serif",
-          fontSize: '1rem'
+          fontSize: this.isMobile ? '.8rem' : '1rem'
         },
         colorizeCell: (row, col, hidden) => {
           
