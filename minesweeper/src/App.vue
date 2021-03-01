@@ -1,28 +1,32 @@
 <template>
   <v-app style="background-color: #74ad4c">
     <v-app-bar flat color="green">
-      <v-container fluid class="text-h4 font-weight-bold white--text">
+      <v-container fluid class="font-weight-bold white--text">
         <v-row>
-          <v-col cols="2" align-self="center" class="d-flex align-center">
+          <v-col
+            cols="9"
+            sm="6"
+            align-self="center"
+            class="d-flex align-center justify-start px-0"
+          >
             <v-btn-toggle group mandatory v-model="difficulty">
-              <v-btn value="easy" large>
-                Easy
-              </v-btn>
-              <v-btn value="medium" large selected> 
-                Medium
-              </v-btn>
-              <v-btn value="hard" large>
-                Hard
-              </v-btn>
+              <v-btn value="easy"> Easy </v-btn>
+              <v-btn value="medium" selected> Medium </v-btn>
+              <v-btn value="hard"> Hard </v-btn>
             </v-btn-toggle>
-            <v-btn icon large class="ml-2">
-                <v-icon color="white">mdi-refresh</v-icon>
-              </v-btn>
+            <v-btn icon class="ml-sm-2" @click="newGame">
+              <v-icon color="white">mdi-refresh</v-icon>
+            </v-btn>
           </v-col>
           <v-spacer></v-spacer>
-          <v-col cols="2" align-self="center" class="d-flex justify-end">
-            <span class="mr-2">🚩 {{ flagsAvailable }}</span>
-            <span>⏲️ {{ timeElapsed | padTime }}</span>
+          <v-col
+            cols="3"
+            sm="6"
+            align-self="center"
+            class="d-flex flex-column flex-sm-row justify-end align-end"
+          >
+            <span class="mr-sm-2 text-right text-sm-h5">🚩 {{ flagsAvailable }}</span>
+            <span class="text-sm-h5">⏲️ {{ timeElapsed | padTime }}</span>
           </v-col>
         </v-row>
       </v-container>
@@ -42,6 +46,7 @@
             <div
               v-for="(col, colIndex) in row"
               :key="colIndex"
+              class="text-sm-h5"
               ref="cell"
               :style="[
                 styles.cell,
@@ -479,7 +484,7 @@ export default {
     },
   },
   watch: {
-    difficulty: "newGame"
+    difficulty: "newGame",
   },
   filters: {
     padTime(num) {
