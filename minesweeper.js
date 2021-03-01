@@ -8,8 +8,12 @@ var app = new Vue({
     boardKey: 0,
     difficulty: "medium",
     gameStarted: false,
+    gameEnded: false,
     timeElapsed: 0,
-    interval: null
+    interval: null,
+    vertical: false,
+    backgroundStore: '',
+    isMobile: false
   },
   methods: {
     frameBoard() {
@@ -108,6 +112,10 @@ var app = new Vue({
 
     },
     reveal(row, col) {
+      if (this.gameEnded) {
+        return;
+      }
+
       if (!this.gameStarted) {
         this.board = this.finishBoard(row, col);
         this.gameStarted = true;
@@ -139,8 +147,13 @@ var app = new Vue({
   
     gameOver(cell) {
       cell.content = "❌";
-      this.bombCells.forEach(b => b.hidden = false);
+      this.bombCells.forEach(b => {
+        let index = this.bombCells.indexOf(b);
+        let randomTimeout = Math.random() * 30;
+        setTimeout(() => b.hidden = false, index * randomTimeout)
+      });
       this.stopTimer();
+      this.gameEnded = true;
     },
   
     gameWon(arr) {
@@ -149,6 +162,7 @@ var app = new Vue({
         c.hidden = false;
       })
       this.stopTimer();
+      this.gameEnded = true;
     },
   
     revealNeighbors(board, row, col) {
@@ -192,6 +206,7 @@ var app = new Vue({
       return inboundsNeighbors.filter(neighbor => neighbor);
     },
     newGame() {
+      this.gameEnded = false;
       this.boardKey++;
 
       if (this.interval) {
@@ -201,17 +216,34 @@ var app = new Vue({
       }
 
       if (this.difficulty === "easy") {
-        this.rows = 8;
-        this.cols = 10;
+        if (!this.isMobile) {
+          this.rows = 8;
+          this.cols = 10;
+        } else {
+          this.rows = 10;
+          this.cols = 7;
+        }
         this.bombs = 10;
       } else if (this.difficulty === "medium") {
-        this.rows = 14;
-        this.cols = 18;
-        this.bombs = 40;
+        if (!this.isMobile) {
+          this.rows = 14;
+          this.cols = 18;
+          this.bombs = 40;
+        } else{
+          this.rows = 16;
+          this.cols = 12;
+          this.bombs = 35
+        } 
       } else {
-        this.rows = 20;
-        this.cols = 24;
-        this.bombs = 99;
+        if (!this.isMobile) {
+          this.rows = 20;
+          this.cols = 24;
+          this.bombs = 99;
+        } else {
+          this.rows = 21;
+          this.cols = 16;
+          this.bombs = 75;
+        }
       }
 
       let board = this.frameBoard();
@@ -226,13 +258,40 @@ var app = new Vue({
     stopTimer() {
       clearInterval(this.interval);
     },
-    lighten(index) {
-      let cell = this.$refs.cell[index];
-      cell.style.opacity = "75%";
+    highlight(index) {
+      let el = this.$refs.cell[index];
+      if (el.style.backgroundColor === "rgb(142, 204, 57)" ||
+          el.style.backgroundColor === "rgb(167, 217, 72)") {
+            this.backgroundStore = el.style.backgroundColor;
+            el.style.backgroundColor = "rgba(255, 255, 255, 0.8)"
+      } else {
+        if (el.innerText) {
+          this.backgroundStore = el.style.backgroundColor;
+          el.style.backgroundColor = "rgba(255, 255, 255, 0.8)"
+        }
+      }
     },
     restore(index) {
-      let cell = this.$refs.cell[index];
-      return cell.style.opacity = "100%";
+      let el = this.$refs.cell[index];
+      if (el.style.backgroundColor === "rgba(255, 255, 255, 0.8)") {
+        el.style.backgroundColor = this.backgroundStore;
+        this.backgroundColor = "";
+      }
+    },
+    detectMobile() {
+      let w = window.innerWidth;
+
+      if (w <= 600) {
+        return this.isMobile = true;
+      } else {
+        return;
+      }
+    },
+    boardWidth(rows, cols) {
+      let top = Math.abs(rows - cols);
+      let bottom = Math.round((rows + cols) / 2);
+
+      return top / bottom * 100;
     }
   },
   computed: {
@@ -248,12 +307,21 @@ var app = new Vue({
     bombCells() {
       return this.board.flat().filter(c => c.content === "💣");
     },
+    maxHeight() {
+      return (1 - ((this.cols / this.rows) % 1)) * 100;
+    },
     styles() {
       return {
+        wrapper: {
+          height: 'calc(100vh - 3rem)',
+          width: '100vw',
+          display: 'flex',
+          justifyContent:'center',
+          alignItems: 'center'
+        },
         board: {
-          margin: '2rem auto',
-          aspectRatio: `${this.cols}/${this.rows}`,
-          maxHeight: `calc(100vh - 7rem)`,
+          minWidth: `calc(350px * ${this.cols / this.rows}`,
+          minHeight: '350px',
           display: "grid",
           gridTemplateRows: `repeat(${this.rows}, 1fr)`,
           boxShadow: '10px 10px 10px #4a752c'
@@ -263,38 +331,39 @@ var app = new Vue({
           gridTemplateColumns: `repeat(${this.cols}, 1fr)`
         },
         cell: {
-          aspectRatio: "1/1",
+          aspectRatio: '1/1',
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
           fontFamily: "Rubik, sans-serif",
-          fontSize: '1.5rem'
+          fontSize: '1rem'
         },
         colorizeCell: (row, col, hidden) => {
-          if (row % 2 === 0) {
-            if (col % 2 === 0) {
-              if (hidden) {
+          
+          if (hidden) {
+            if (row % 2 === 0) {
+              if (col % 2 === 0) {
                 return {backgroundColor: '#8ecc39'};
               } else {
-                return {backgroundColor: '#d7b899'};
+                return {backgroundColor: '#a7d948'};
               }
             } else {
-              if (hidden) {
+              if (col % 2 === 0) {
                 return {backgroundColor: '#a7d948'};
               } else {
-                return {backgroundColor: '#e5c29f'};
+                return {backgroundColor: '#8ecc39'};
               }
             }
           } else {
-            if (col % 2 === 0) {
-              if (hidden) {
-                return {backgroundColor: '#a7d948'};
+            if (row % 2 === 0) {
+              if (col % 2 === 0) {
+                return {backgroundColor: '#d7b899'};
               } else {
                 return {backgroundColor: '#e5c29f'};
               }
             } else {
-              if (hidden) {
-                return {backgroundColor: '#8ecc39'};
+              if (col % 2 === 0) {
+                return {backgroundColor: '#e5c29f'};
               } else {
                 return {backgroundColor: '#d7b899'};
               }
@@ -333,6 +402,7 @@ var app = new Vue({
     }
   },
   created() {
+    this.detectMobile();
     this.newGame();
   }
 })
