@@ -1,18 +1,20 @@
 <template>
-  <v-app style="background-color: #74ad4c">
-    <v-app-bar flat color="green">
+  <v-app>
+    <v-app-bar flat class="light-green lighten-1">
       <v-container fluid class="font-weight-bold white--text">
         <v-row>
           <v-col
-            cols="9"
+            cols="8"
             sm="6"
             align-self="center"
             class="d-flex align-center justify-start px-0"
           >
             <v-btn-toggle group mandatory v-model="difficulty">
-              <v-btn value="easy"> Easy </v-btn>
-              <v-btn value="medium" selected> Medium </v-btn>
-              <v-btn value="hard"> Hard </v-btn>
+              <v-btn value="easy"> {{ this.isMobile ? "E" : "Easy" }} </v-btn>
+              <v-btn value="medium" selected>
+                {{ this.isMobile ? "M" : "Medium" }}
+              </v-btn>
+              <v-btn value="hard"> {{ this.isMobile ? "H" : "Hard" }} </v-btn>
             </v-btn-toggle>
             <v-btn icon class="ml-sm-2" @click="newGame">
               <v-icon color="white">mdi-refresh</v-icon>
@@ -20,50 +22,82 @@
           </v-col>
           <v-spacer></v-spacer>
           <v-col
-            cols="3"
+            cols="4"
             sm="6"
             align-self="center"
             class="d-flex flex-column flex-sm-row justify-end align-end"
           >
-            <span class="mr-sm-2 text-right text-sm-h5">🚩 {{ flagsAvailable }}</span>
+            <span class="mr-sm-2 text-right text-sm-h5"
+              >🚩 {{ flagsAvailable }}</span
+            >
             <span class="text-sm-h5">⏲️ {{ timeElapsed | padTime }}</span>
           </v-col>
         </v-row>
       </v-container>
     </v-app-bar>
-    <transition
-      appear
-      name="transition"
-      enter-active-class="animate__animated animate__jackInTheBox"
-    >
-      <div :key="boardKey" class="wrapper" :style="styles.wrapper">
-        <div :style="styles.board">
+    <v-container fluid class="wrapper light-green lighten-3" :style="styles.wrapper">
+      <div :key="boardKey" :style="styles.board">
+        <div
+          v-for="(row, rowIndex) in board"
+          :key="rowIndex"
+          :style="styles.row"
+        >
           <div
-            v-for="(row, rowIndex) in board"
-            :key="rowIndex"
-            :style="styles.row"
+            v-for="(col, colIndex) in row"
+            :key="colIndex"
+            class="text-body-1 font-weight-bold font-weight-sm-regular text-sm-h5"
+            ref="cell"
+            :style="[
+              styles.cell,
+              styles.colorizeCell(rowIndex, colIndex, col.hidden),
+              styles.colorizeClues(col.content),
+            ]"
+            @click="reveal(rowIndex, colIndex)"
+            v-touch="{
+              left: () => (col.marked = false),
+              right: () => (col.marked = true),
+            }"
+            @click.right.prevent="col.marked = !col.marked"
+            @mouseover="highlight(board.flat().indexOf(col))"
+            @mouseleave="restore(board.flat().indexOf(col))"
           >
-            <div
-              v-for="(col, colIndex) in row"
-              :key="colIndex"
-              class="text-sm-h5"
-              ref="cell"
-              :style="[
-                styles.cell,
-                styles.colorizeCell(rowIndex, colIndex, col.hidden),
-                styles.colorizeClues(col.content),
-              ]"
-              @click="reveal(rowIndex, colIndex)"
-              @click.right.prevent="col.marked = !col.marked"
-              @mouseover="highlight(board.flat().indexOf(col))"
-              @mouseleave="restore(board.flat().indexOf(col))"
-            >
-              {{ col.hidden ? (col.marked ? "🚩" : "") : col.content }}
-            </div>
+            {{ col.hidden ? (col.marked ? "🚩" : "") : col.content }}
           </div>
         </div>
       </div>
-    </transition>
+    </v-container>
+    <v-dialog v-model="gameWon" height="350px" width="500px">
+      <v-card rounded>
+        <v-container>
+          <v-row>
+            <v-col class="text-h4 text-center">You win!</v-col>
+          </v-row>
+          <v-row>
+            <v-col class="d-flex flex-column align-center">
+              <span class="font-weight-bold">Difficulty:</span>
+              <span>{{
+                difficulty.charAt(0).toUpperCase() + difficulty.slice(1)
+              }}</span>
+            </v-col>
+            <v-col class="d-flex flex-column align-center">
+              <span class="font-weight-bold">Your Time:</span>
+              <span>{{ timeElapsed }} seconds</span>
+            </v-col>
+            <v-col class="d-flex flex-column align-center">
+              <span class="font-weight-bold">Your Best Time:</span>
+              <span>{{ bestTimeAtDifficulty() }} seconds</span>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col class="d-flex justify-center">
+              <v-btn color="green" dark block @click="newGame"
+                >Play Again?</v-btn
+              >
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-card>
+    </v-dialog>
   </v-app>
 </template>
 
@@ -85,14 +119,22 @@ export default {
       difficulty: "medium",
       gameStarted: false,
       gameEnded: false,
+      gameWon: false,
       timeElapsed: 0,
       interval: null,
-      vertical: false,
       backgroundStore: "",
       isMobile: false,
     };
   },
   methods: {
+    autoWin() {
+      this.board.flat().forEach((c) => {
+        if (c.content !== "💣") {
+          c.hidden = false;
+        }
+      });
+      return this.evaluateForWin();
+    },
     frameBoard() {
       let board = [];
 
@@ -222,28 +264,46 @@ export default {
       if (this.hiddenCells.some((c) => !c.content || c.content !== "💣")) {
         return;
       } else {
-        return this.gameWon(this.hiddenCells);
+        return this.bombsSwept(this.hiddenCells);
       }
     },
 
     gameOver(cell) {
       cell.content = "❌";
+
       this.bombCells.forEach((b) => {
         let index = this.bombCells.indexOf(b);
         let randomTimeout = Math.random() * 30;
         setTimeout(() => (b.hidden = false), index * randomTimeout);
       });
+
       this.stopTimer();
       this.gameEnded = true;
     },
 
-    gameWon(arr) {
+    bombsSwept(arr) {
       arr.forEach((c) => {
         c.marked = false;
         c.hidden = false;
       });
+
       this.stopTimer();
+      this.storeTime();
       this.gameEnded = true;
+      this.gameWon = true;
+    },
+
+    storeTime() {
+      if (!localStorage.getItem(this.difficulty)) {
+        return localStorage.setItem(this.difficulty, this.timeElapsed);
+      } else {
+        let bestTime = localStorage.getItem(this.difficulty);
+        if (this.timeElapsed < bestTime) {
+          return localStorage.setItem(this.difficulty, this.timeElapsed);
+        } else {
+          return;
+        }
+      }
     },
 
     revealNeighbors(board, row, col) {
@@ -294,6 +354,7 @@ export default {
     },
     newGame() {
       this.gameEnded = false;
+      this.gameWon = false;
       this.boardKey++;
 
       if (this.interval) {
@@ -376,11 +437,8 @@ export default {
         return;
       }
     },
-    boardWidth(rows, cols) {
-      let top = Math.abs(rows - cols);
-      let bottom = Math.round((rows + cols) / 2);
-
-      return (top / bottom) * 100;
+    bestTimeAtDifficulty() {
+      return localStorage.getItem(this.difficulty);
     },
   },
   computed: {
@@ -395,13 +453,10 @@ export default {
     bombCells() {
       return this.board.flat().filter((c) => c.content === "💣");
     },
-    heightInPixels() {
-      return document.getElementById("board").clientHeight;
-    },
     styles() {
       return {
         wrapper: {
-          height: "calc(100vh - 3rem)",
+          height: this.isMobile ? "calc(100vh - 56px)" : "calc(100vh - 64px)",
           width: `100vw`,
           display: "flex",
           justifyContent: "center",
@@ -428,21 +483,21 @@ export default {
           justifyContent: "center",
           alignItems: "center",
           fontFamily: "Rubik, sans-serif",
-          fontSize: this.isMobile ? ".8rem" : "1rem",
+          fontSize: this.isMobile ? ".7rem" : "1rem",
         },
         colorizeCell: (row, col, hidden) => {
           if (hidden) {
             if (row % 2 === 0) {
               if (col % 2 === 0) {
-                return { backgroundColor: "#8ecc39" };
+                return { backgroundColor: "#7CB342" };
               } else {
-                return { backgroundColor: "#a7d948" };
+                return { backgroundColor: "#9CCC65" };
               }
             } else {
               if (col % 2 === 0) {
-                return { backgroundColor: "#a7d948" };
+                return { backgroundColor: "#9CCC65" };
               } else {
-                return { backgroundColor: "#8ecc39" };
+                return { backgroundColor: "#7CB342" };
               }
             }
           } else {
