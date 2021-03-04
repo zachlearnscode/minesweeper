@@ -1,6 +1,66 @@
 <template>
   <v-app>
-    <v-app-bar flat class="light-green lighten-1">
+    <v-main class="d-flex justify-center align-center light-green lighten-3">
+      <v-container
+        class="wrapper d-flex flex-column pa-0"
+        :style="styles.wrapper"
+      >
+        <div
+          style="height: 56px; width: 100%"
+          class="light-green darken-3 d-flex space-between"
+        >
+          <div>
+            <v-btn-toggle group mandatory v-model="difficulty">
+              <v-btn value="easy"> {{ this.isMobile ? "E" : "Easy" }} </v-btn>
+              <v-btn value="medium" selected>
+                {{ this.isMobile ? "M" : "Medium" }}
+              </v-btn>
+              <v-btn value="hard"> {{ this.isMobile ? "H" : "Hard" }} </v-btn>
+            </v-btn-toggle>
+            <v-btn icon class="ml-sm-2" @click="newGame">
+              <v-icon color="white">mdi-refresh</v-icon>
+            </v-btn>
+          </div>
+          <div>
+            <span class="mr-sm-2 text-right text-sm-h5"
+              >🚩 {{ flagsAvailable }}</span
+            >
+            <span class="text-sm-h5">⏲️ {{ timeElapsed | padTime }}</span>
+          </div>
+        </div>
+
+        <div :key="boardKey" :style="styles.board">
+          <div
+            v-for="(row, rowIndex) in board"
+            :key="rowIndex"
+            :style="styles.row"
+          >
+            <div
+              v-for="(col, colIndex) in row"
+              :key="colIndex"
+              class="text-body-1 font-weight-bold font-weight-sm-regular text-sm-h5"
+              ref="cell"
+              :style="[
+                styles.cell,
+                styles.colorizeCell(rowIndex, colIndex, col.hidden),
+                styles.colorizeClues(col.content),
+              ]"
+              @click="reveal(rowIndex, colIndex)"
+              v-touch="{
+                left: () => (col.marked = false),
+                right: () => (col.marked = true),
+              }"
+              @click.right.prevent="col.marked = !col.marked"
+              @mouseover="highlight(board.flat().indexOf(col))"
+              @mouseleave="restore(board.flat().indexOf(col))"
+            >
+              {{ col.hidden ? (col.marked ? "🚩" : "") : col.content }}
+            </div>
+          </div>
+        </div>
+      </v-container>
+    </v-main>
+    <!--<v-app-bar flat class="light-green lighten-1">
       <v-container fluid class="font-weight-bold white--text">
         <v-row>
           <v-col
@@ -34,38 +94,8 @@
           </v-col>
         </v-row>
       </v-container>
-    </v-app-bar>
-    <v-container fluid class="wrapper light-green lighten-3" :style="styles.wrapper">
-      <div :key="boardKey" :style="styles.board">
-        <div
-          v-for="(row, rowIndex) in board"
-          :key="rowIndex"
-          :style="styles.row"
-        >
-          <div
-            v-for="(col, colIndex) in row"
-            :key="colIndex"
-            class="text-body-1 font-weight-bold font-weight-sm-regular text-sm-h5"
-            ref="cell"
-            :style="[
-              styles.cell,
-              styles.colorizeCell(rowIndex, colIndex, col.hidden),
-              styles.colorizeClues(col.content),
-            ]"
-            @click="reveal(rowIndex, colIndex)"
-            v-touch="{
-              left: () => (col.marked = false),
-              right: () => (col.marked = true),
-            }"
-            @click.right.prevent="col.marked = !col.marked"
-            @mouseover="highlight(board.flat().indexOf(col))"
-            @mouseleave="restore(board.flat().indexOf(col))"
-          >
-            {{ col.hidden ? (col.marked ? "🚩" : "") : col.content }}
-          </div>
-        </div>
-      </div>
-    </v-container>
+    </v-app-bar>-->
+
     <v-dialog v-model="gameWon" height="350px" width="500px">
       <v-card rounded>
         <v-container>
@@ -456,23 +486,24 @@ export default {
     styles() {
       return {
         wrapper: {
-          height: this.isMobile ? "calc(100vh - 56px)" : "calc(100vh - 64px)",
-          width: `100vw`,
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          padding: "1rem",
-        },
-        board: {
           height: this.isMobile
-            ? `calc(90vw * ${this.rows / this.cols})`
-            : "80vh",
+            ? `calc(90vw * ${this.rows / this.cols} + 56px)`
+            : "calc(90vh + 56px)",
           width: this.isMobile
             ? "90vw"
-            : `calc(80vh * ${this.cols / this.rows})`,
+            : `calc(90vh * ${this.cols / this.rows})`,
+          boxShadow: "10px 10px 10px #4a752c",
+          //width: `100vw`,
+          //display: "flex",
+          //justifyContent: "center",
+          //alignItems: "center",
+          //padding: "1rem",
+        },
+        board: {
+          height: "100%",
+          width: "100%",
           display: "grid",
           gridTemplateRows: `repeat(${this.rows}, 1fr)`,
-          boxShadow: "10px 10px 10px #4a752c",
         },
         row: {
           display: "grid",
