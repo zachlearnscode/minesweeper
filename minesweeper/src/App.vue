@@ -28,7 +28,9 @@
             <div class="mr-sm-2 text-right text-sm-h5 white--text">
               🚩 {{ flagsAvailable }}
             </div>
-            <div class="text-sm-h5 white--text">⏲️ {{ timeElapsed | padTime }}</div>
+            <div class="text-sm-h5 white--text">
+              ⏲️ {{ timeElapsed | padTime }}
+            </div>
           </div>
         </div>
 
@@ -49,8 +51,9 @@
                 styles.colorizeClues(col.content),
               ]"
               @click="reveal(rowIndex, colIndex)"
+              @click.middle.prevent="revealChord(rowIndex, colIndex)"
               v-touch="{
-                left: () => (col.marked = !col.marked),
+                left: () => (revealChord(rowIndex, colIndex)),
                 right: () => (col.marked = !col.marked),
               }"
               @click.right.prevent="col.marked = !col.marked"
@@ -63,7 +66,7 @@
         </div>
       </v-container>
     </v-main>
-    
+
     <v-dialog v-model="gameWon" height="350px" width="500px">
       <v-card rounded>
         <v-container>
@@ -102,10 +105,6 @@
 <script>
 export default {
   name: "Minesweeper",
-
-  components: {
-    //
-  },
 
   data() {
     return {
@@ -255,6 +254,40 @@ export default {
         }
 
         return this.evaluateForWin();
+      }
+    },
+
+    revealChord(row, col) {
+      let cell = this.board[row][col];
+
+      if (!cell.hidden && cell.content) {
+        let cellContent = Number(cell.content);
+
+        let neighbors = this.findNeighbors(this.board, row, col);
+
+        let flaggedNeighbors = 0;
+        neighbors.forEach((n) => {
+          let neighbor = this.board[n.row][n.col];
+          if (neighbor.marked) {
+            flaggedNeighbors++;
+          }
+        });
+
+        if (flaggedNeighbors === cellContent) {
+          neighbors.forEach((n) => {
+            let neighbor = this.board[n.row][n.col];
+            if (!neighbor.marked && neighbor.hidden) {
+              neighbor.hidden = false;
+              if (neighbor.content === "💣") {
+                return this.gameOver(neighbor);
+              } else {
+                return;
+              }
+            }
+          });
+        }
+      } else {
+        return;
       }
     },
 
@@ -460,7 +493,7 @@ export default {
           width: this.isMobile
             ? "90vw"
             : `calc(90vh * ${this.cols / this.rows})`,
-          boxShadow: "10px 10px 10px #4a752c"
+          boxShadow: "10px 10px 10px #4a752c",
         },
         board: {
           height: "100%",
