@@ -57,8 +57,8 @@
                 right: () => (col.marked = !col.marked),
               }"
               @click.right.prevent="col.marked = !col.marked"
-              @mouseover="highlight(board.flat().indexOf(col))"
-              @mouseleave="restore(board.flat().indexOf(col))"
+              @mouseover="this.isMobile ? '' : highlight(board.flat().indexOf(col))"
+              @mouseleave="this.isMobile ? '' : restore(board.flat().indexOf(col))"
             >
               {{ col.hidden ? (col.marked ? "🚩" : "") : col.content }}
             </div>
@@ -280,6 +280,8 @@ export default {
               neighbor.hidden = false;
               if (neighbor.content === "💣") {
                 return this.gameOver(neighbor);
+              } else if (!neighbor.content) {
+                this.revealNeighbors(this.board, n.row, n.col);
               } else {
                 return;
               }
